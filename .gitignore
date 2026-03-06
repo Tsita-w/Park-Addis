@@ -1,0 +1,13 @@
+# Server secrets
+server/.env
+
+# Dependencies
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# Build files
+client/build/
+
+# OS files
+.DS_Store
