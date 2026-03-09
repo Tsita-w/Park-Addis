@@ -5,22 +5,30 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// 1. Initialize the app FIRST
 const app = express();
 
-// 2. Import your routes
+// 1. IMPORT THE PARKING ROUTES (Add this line)
+const parkingRoutes = require('./routes/parkingRoutes');
+
 const slotRoutes = require('./routes/slotRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 
-// 3. Middleware (Must come before routes)
 app.use(cors());
 app.use(express.json());
 
-// 4. Register your routes
+// 2. REGISTER THE PARKING ROUTES (Add this line)
+app.use('/api/parking', parkingRoutes);
+
 app.use('/api/slots', slotRoutes);
 app.use('/api/bookings', bookingRoutes);
 
-// LOG FOR DEBUGGING
+// --- REST OF YOUR CODE (MONGOOSE CONNECT & LISTEN) ---
+
+// 3. ADD A "HOME" ROUTE FOR QUICK TESTING (Optional but helpful)
+app.get('/', (req, res) => {
+    res.send("Park-Addis Server is running!");
+});
+
 console.log("------------------------------------");
 if (process.env.MONGO_URI) {
     console.log("✅ Secret found! Attempting to connect...");
