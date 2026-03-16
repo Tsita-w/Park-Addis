@@ -1,3 +1,6 @@
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']); // Fixes MongoDB connection issues in Ethiopia
+
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
@@ -7,34 +10,34 @@ const cors = require('cors');
 
 const app = express();
 
-// 1. IMPORT THE PARKING ROUTES (Add this line)
+// Import Routes
 const parkingRoutes = require('./routes/parkingRoutes');
-
 const slotRoutes = require('./routes/slotRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// 2. REGISTER THE PARKING ROUTES (Add this line)
+// Routes
 app.use('/api/parking', parkingRoutes);
-
 app.use('/api/slots', slotRoutes);
 app.use('/api/bookings', bookingRoutes);
 
-// --- REST OF YOUR CODE (MONGOOSE CONNECT & LISTEN) ---
-
-// 3. ADD A "HOME" ROUTE FOR QUICK TESTING (Optional but helpful)
 app.get('/', (req, res) => {
     res.send("Park-Addis Server is running!");
 });
 
+// Database Connection Logic
 console.log("------------------------------------");
 if (process.env.MONGO_URI) {
-    console.log("✅ Secret found! Attempting to connect...");
+    console.log("✅ MONGO_URI found! Attempting to connect...");
 } else {
-    console.log("❌ Secret NOT found!");
+    console.log("❌ MONGO_URI NOT found in .env!");
 }
+
+// 💳 THE CHAPA CHECK YOU REQUESTED
+console.log("💳 Chapa Key Loaded:", process.env.CHAPA_SECRET_KEY ? "YES (Ready to pay)" : "NO (Check .env)");
 console.log("------------------------------------");
 
 mongoose.connect(process.env.MONGO_URI)

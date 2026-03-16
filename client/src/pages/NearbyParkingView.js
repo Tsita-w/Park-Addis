@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Badge } from "../components/ui/badge";
 import { Card } from "../components/ui/card";
+import toast from 'react-hot-toast';
 
 // --- MAP IMPORTS ---
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -45,52 +46,55 @@ const NearbyParkingView = () => {
       try {
         const response = await fetch('http://localhost:5000/api/parking/all');
         const data = await response.json();
-        setParkingSpots(data);
+        // Ensure we only set state if data is an array
+        setParkingSpots(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching spots:", error);
+        setParkingSpots([]); // Fallback to empty array
       }
     };
     fetchSpots();
   }, []);
 
   // Fetch Slots when a garage is selected
-  useEffect(() => {
+  // Fetch Slots when a garage is selected
+useEffect(() => {
     if (selectedSpot && isModalOpen) {
       setLoadingSlots(true);
 
+      // FIXED: URL now matches your slotRoutes.js backend (/api/slots/parking/:lotId)
       fetch(`http://localhost:5000/api/slots/parking/${selectedSpot._id}`)
         .then((res) => {
           if (!res.ok) throw new Error("Server error");
           return res.json();
         })
         .then((data) => {
-          setAvailableSlots(data);
+          setAvailableSlots(Array.isArray(data) ? data : []);
           setLoadingSlots(false);
         })
         .catch((err) => {
           console.error("Fetch error:", err);
+          setAvailableSlots([]);
           setLoadingSlots(false);
         });
     }
   }, [selectedSpot, isModalOpen]);
 
-  const filteredSpots = parkingSpots.filter(spot =>
-    spot.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-  );
+  // 3. Filter Logic with Safety Check
+  const filteredSpots = Array.isArray(parkingSpots)
+    ? parkingSpots.filter(spot =>
+        spot.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+      )
+    : [];
 
-  // --- HANDLER: handleConfirmBooking ---
-  // This replaces handleConfirmSelection to fix the undefined error.
   const handleConfirmBooking = async () => {
-    if (!chosenSlot) {
-      alert("Please select a slot first!");
-      return;
-    }
+    if (!chosenSlot) return;
 
     setBookingLoading(true);
     const bookingData = {
       slotId: chosenSlot._id,
       lotId: selectedSpot._id,
-      userId: "65f1a2b3c4d5e6f7a8b9c0d1", // Placeholder User ID
+      userId: "65f1a2b3c4d5e6f7a8b9c0d1",
       startTime: new Date()
     };
 
@@ -102,21 +106,59 @@ const NearbyParkingView = () => {
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        // Success: Store data to trigger QR code view
         setBookingSuccessData(data);
       } else {
         alert("Booking failed: " + data.message);
       }
     } catch (err) {
       console.error("Error creating booking:", err);
-      alert("Server error. Please try again later.");
     } finally {
       setBookingLoading(false);
     }
   };
 
+
+const handlePayment = async () => {
+    // 1. Start the loading state and the toast
+    setBookingLoading(true);
+    const loadingToast = toast.loading('Connecting to Telebirr...');
+
+    try {
+        const response = await fetch('http://localhost:5000/api/bookings/pay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                slotId: chosenSlot._id,
+                lotId: selectedSpot._id,
+                amount: selectedSpot.pricePerHour,
+                userId: "65f1a2b3c4d5e6f7a8b9c0d1"
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.checkout_url) {
+            // 2. Success toast before redirecting
+            toast.success('Redirecting to Chapa...', { id: loadingToast });
+
+            // Give the user a split second to see the success message before redirecting
+            setTimeout(() => {
+                window.location.href = data.checkout_url;
+            }, 800);
+
+        } else {
+            // 3. Error toast if backend sends a message
+            toast.error("Payment error: " + (data.message || "Unknown error"), { id: loadingToast });
+        }
+    } catch (err) {
+        console.error("Payment initiation failed", err);
+        // 4. Error toast if the network fails
+        toast.error('Network Error: Could not connect to server', { id: loadingToast });
+    } finally {
+        setBookingLoading(false);
+    }
+};
   return (
     <div className="flex h-screen w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
 
@@ -225,11 +267,11 @@ const NearbyParkingView = () => {
                 </div>
 
                 <Button
-                  disabled={!chosenSlot || bookingLoading}
-                  className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg transition-transform active:scale-95"
-                  onClick={handleConfirmBooking}
-                >
-                  {bookingLoading ? "Confirming..." : "Confirm Selection"}
+                disabled={!chosenSlot || bookingLoading}
+                className="w-full h-14 rounded-2xl bg-blue-600 ..."
+                 // CHANGE THIS LINE:
+                onClick={handlePayment}>
+                {bookingLoading ? "Connecting to Telebirr..." : "Pay & Confirm Selection"}
                 </Button>
               </>
             ) : (
