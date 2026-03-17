@@ -2,13 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Slot = require('../models/Slot');
 
-// --- GET all slots for a specific parking lot ID ---
-// Matches frontend: fetch(`http://localhost:5000/api/slots/parking/${lotId}`)
-// server/routes/slotRoutes.js
 router.get('/parking/:lotId', async (req, res) => {
     try {
         const slots = await Slot.find({ lotId: req.params.lotId });
-        console.log(`Found ${slots.length} slots for ${req.params.lotId}`); // Check your terminal!
+        console.log(`Found ${slots.length} slots for ${req.params.lotId}`);
         res.json(slots);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -26,6 +23,16 @@ router.get('/:lotId/available', async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Server Error: " + err.message });
     }
+});
+
+// GET /api/slots/dashboard
+router.get("/dashboard", async (req, res) => {
+  try {
+    const slots = await Slot.find().select('label status isAvailable lotId');
+    res.json(slots);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 module.exports = router;
