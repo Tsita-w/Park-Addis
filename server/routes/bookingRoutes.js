@@ -236,7 +236,10 @@ router.delete("/admin/bookings/:id", async (req, res) => {
 
 router.get("/current-price/:lotId", async (req, res) => {
   const totalSlots = await Slot.countDocuments({ lotId: req.params.lotId });
-  const occupiedSlots = await Slot.countDocuments({ lotId: req.params.lotId, isAvailable: false });
+  const occupiedSlots = await Slot.countDocuments({
+    lotId: req.params.lotId,
+    isAvailable: false,
+  });
   const occupancyRate = occupiedSlots / totalSlots;
 
   const basePrice = 50; // You can also fetch this from the 'Parking' model
@@ -245,8 +248,70 @@ router.get("/current-price/:lotId", async (req, res) => {
   res.json({
     price: finalPrice,
     multiplier: (finalPrice / basePrice).toFixed(1),
-    demandLevel: occupancyRate > 0.8 ? "High" : "Normal"
+    demandLevel: occupancyRate > 0.8 ? "High" : "Normal",
   });
 });
 
+// POST /api/bookings/check-out
+router.post("/check-out", async (req, res) => {
+  const { plateNumber } = req.body;
+  const HOURLY_RATE = 20; // Set your price per hour (e.g., 20 ETB)
+
+  try {
+    // 1. Find the active booking for this car
+    const booking = await Booking.findOne({
+      plateNumber: plateNumber,
+      status: "Active",
+    });
+
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ message: "No active booking found for this plate." });
+    }
+
+    // 2. Calculate Duration
+    const checkOutTime = new Date();
+    const checkInTime = new Date(booking.checkInTime);
+
+    // Difference in milliseconds converted to hours
+    const durationMs = checkOutTime - checkInTime;
+    const durationHours = Math.ceil(durationMs / (1000 * 60 * 60)); // Round up to nearest hour
+
+    // 3. Calculate Total Price
+    const totalPrice = durationHours * HOURLY_RATE;
+
+    // 4. Update Booking Status
+    booking.checkOutTime = checkOutTime;
+    booking.totalPrice = totalPrice;
+    booking.status = "Completed";
+    await booking.save();
+
+    // 5. Make the Parking Slot available again
+    await Slot.findByIdAndUpdate(booking.slotId, { isAvailable: true });
+
+    res.status(200).json({
+      message: "Check-out successful",
+      summary: {
+        plate: plateNumber,
+        duration: `${durationHours} hrs`,
+        totalAmount: `${totalPrice} ETB`,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Check-out failed", details: error.message });
+  }
+});
+
+// GET only active bookings for the Attendant
+router.get("/active", async (req, res) => {
+  try {
+    const activeOnes = await Booking.find({ status: "Active" })
+      .populate("slotId")
+      .sort({ checkInTime: -1 }); // Newest arrivals at the top
+    res.json(activeOnes);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching active bookings" });
+  }
+});
 module.exports = router;

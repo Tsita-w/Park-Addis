@@ -15,7 +15,7 @@ const app = express();
 const parkingRoutes = require('./routes/parkingRoutes');
 const slotRoutes = require('./routes/slotRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
-
+app.use('/api/incidents', require('./routes/incidentRoutes'));
 // Middleware
 app.use(cors());
 app.use(express.json());

@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-
 const bookingSchema = new mongoose.Schema(
   {
+    // --- RELATIONSHIPS ---
     slotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Slot",
@@ -18,31 +18,43 @@ const bookingSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    startTime: {
+
+    // --- VEHICLE INFO ---
+    plateNumber: {
+      type: String,
+      required: true,
+    },
+
+    // --- TIME TRACKING ---
+    checkInTime: {
       type: Date,
       default: Date.now,
     },
-    // Track the physical booking state
+    checkOutTime: {
+      type: Date,
+    },
+
+    // --- STATUS ---
     status: {
       type: String,
-      enum: ["active", "completed", "cancelled"],
-      default: "active",
+      enum: ["Active", "Completed", "Cancelled"], // Consistent Capitalization
+      default: "Active",
     },
-    // --- NEW PAYMENT FIELDS ---
-    amount: {
+
+    // --- MONEY & PAYMENTS ---
+    totalPrice: {
       type: Number,
-      required: true,
+      default: 0,
     },
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],
       default: "pending",
     },
-    // This stores the unique ID from Telebirr/Chapa/CBE Birr
     transactionId: {
       type: String,
       unique: true,
-      sparse: true, // Allows this to be empty until payment starts
+      sparse: true,
     },
   },
   { timestamps: true },
