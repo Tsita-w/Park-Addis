@@ -15,6 +15,8 @@ const app = express();
 const parkingRoutes = require('./routes/parkingRoutes');
 const slotRoutes = require('./routes/slotRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 app.use('/api/incidents', require('./routes/incidentRoutes'));
 // Middleware
 app.use(cors());
@@ -24,6 +26,7 @@ app.use(express.json());
 app.use('/api/parking', parkingRoutes);
 app.use('/api/slots', slotRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
     res.send("Park-Addis Server is running!");
