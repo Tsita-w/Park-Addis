@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+// Assuming you have these UI components in your project
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -25,8 +26,8 @@ import { Badge } from "../components/ui/badge";
 // This component sits at the top to give a bird's-eye view of the lot
 const OccupancyGrid = ({ slotsData, onReset }) => {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mt-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 mt-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <h2 className="text-lg font-bold flex items-center gap-2">
           <Car className="text-blue-500" /> Live Occupancy Monitor
         </h2>
@@ -174,6 +175,7 @@ const AdminDashboard = () => {
           b.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()),
       )
     : [];
+
   const StatCard = ({ icon: Icon, title, value, color }) => (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
       <div className="flex items-center justify-between">
@@ -189,9 +191,9 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans">
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
             Park-Addis Command Center
@@ -200,7 +202,7 @@ const AdminDashboard = () => {
         </div>
         <button
           onClick={fetchData}
-          className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-all active:scale-95"
+          className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-all w-full sm:w-auto justify-center active:scale-95"
         >
           <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
           <span className="font-medium text-gray-700">Refresh Data</span>
@@ -208,7 +210,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* 1. Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         <StatCard
           icon={DollarSign}
           title="Total Revenue"
@@ -238,22 +240,22 @@ const AdminDashboard = () => {
       {/* 2. Live Occupancy Grid (Passing allSlots to slotsData) */}
       <OccupancyGrid slotsData={allSlots} onReset={handleResetSlot} />
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mt-8">
+      <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 mt-8">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <DollarSign className="text-green-500" /> Pricing Strategy
         </h2>
-        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-4 bg-blue-50 rounded-xl gap-4">
           <div>
             <p className="font-bold text-blue-800">Dynamic Pricing is ACTIVE</p>
             <p className="text-sm text-blue-600">
               Prices are currently increased by 1.5x due to Rush Hour.
             </p>
           </div>
-          <div className="flex gap-2">
-            <button className="bg-white text-blue-600 px-4 py-2 rounded-lg font-bold text-sm border border-blue-200">
+          <div className="flex flex-wrap gap-2 w-full lg:w-auto">
+            <button className="flex-1 lg:flex-none bg-white text-blue-600 px-4 py-2 rounded-lg font-bold text-sm border border-blue-200 whitespace-nowrap">
               Adjust Base Rate
             </button>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">
+            <button className="flex-1 lg:flex-none bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 whitespace-nowrap">
               Disable Dynamic
             </button>
           </div>
@@ -261,40 +263,40 @@ const AdminDashboard = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mt-8 overflow-hidden">
-        <div className="p-6 border-b border-gray-50 flex justify-between items-center">
+        <div className="p-4 md:p-6 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-lg font-bold flex items-center gap-2">
             <Clock className="text-blue-500" /> Recent Reservations
           </h2>
-          <Badge className="bg-blue-50 text-blue-700">Live Updates</Badge>
+          <Badge className="bg-blue-50 text-blue-700 w-fit">Live Updates</Badge>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left min-w-[600px]">
             <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold">
               <tr>
-                <th className="px-6 py-4">User ID / Plate</th>
-                <th className="px-6 py-4">Slot</th>
-                <th className="px-6 py-4">Price</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Action</th>
+                <th className="px-4 md:px-6 py-4">User ID / Plate</th>
+                <th className="px-4 md:px-6 py-4">Slot</th>
+                <th className="px-4 md:px-6 py-4">Price</th>
+                <th className="px-4 md:px-6 py-4">Status</th>
+                <th className="px-4 md:px-6 py-4">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {/* You would map your backend reservations here */}
               <tr className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-6 py-4 font-medium">#65f1...e6f7</td>
-                <td className="px-6 py-4">
+                <td className="px-4 md:px-6 py-4 font-medium">#65f1...e6f7</td>
+                <td className="px-4 md:px-6 py-4">
                   <span className="bg-slate-100 px-2 py-1 rounded-md text-sm font-bold">
                     A-12
                   </span>
                 </td>
-                <td className="px-6 py-4 font-bold">75 ETB</td>
-                <td className="px-6 py-4">
+                <td className="px-4 md:px-6 py-4 font-bold">75 ETB</td>
+                <td className="px-4 md:px-6 py-4">
                   <span className="flex items-center gap-1.5 text-green-600 font-bold text-sm">
                     <CheckCircle2 size={14} /> Paid
                   </span>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 md:px-6 py-4">
                   <button className="text-slate-400 hover:text-red-500 transition-colors">
                     Cancel
                   </button>
@@ -306,8 +308,8 @@ const AdminDashboard = () => {
       </div>
 
       {/* 3. Search and Filtering */}
-      <div className="mt-12 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="relative w-full max-w-md">
+      <div className="mt-12 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative w-full sm:max-w-md">
           <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
             <Search size={18} />
           </span>
@@ -324,15 +326,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* 6. Revenue Reports & Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 mt-8">
         {/* Revenue Chart Placeholder / Summary */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
               <TrendingUp className="text-green-500" /> Revenue Growth
             </h2>
             <select
-              className="text-sm border-gray-200 rounded-lg bg-gray-50 p-1 outline-none"
+              className="text-sm border-gray-200 rounded-lg bg-gray-50 p-2 outline-none w-full sm:w-auto"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
             >
@@ -343,12 +345,12 @@ const AdminDashboard = () => {
           </div>
 
           {/* Simple Bar Representation of Revenue */}
-          <div className="flex items-end gap-2 h-48 border-b border-l border-gray-100 pb-2 pl-2">
+          <div className="flex items-end gap-1 md:gap-2 h-48 border-b border-l border-gray-100 pb-2 pl-2 overflow-x-auto">
             {revenueData.length > 0 ? (
               revenueData.map((data, i) => (
                 <div
                   key={i}
-                  className="flex-1 flex flex-col items-center group relative"
+                  className="flex-1 flex flex-col items-center group relative min-w-[30px]"
                 >
                   <div
                     className="w-full bg-blue-500 rounded-t-sm hover:bg-blue-600 transition-all cursor-pointer"
@@ -357,11 +359,11 @@ const AdminDashboard = () => {
                       minHeight: "10%",
                     }}
                   ></div>
-                  <span className="text-[10px] text-gray-400 mt-2 rotate-45">
+                  <span className="text-[10px] text-gray-400 mt-2 rotate-45 md:rotate-0 text-center">
                     {data.day}
                   </span>
                   {/* Tooltip */}
-                  <div className="absolute hidden group-hover:block bg-gray-800 text-white text-[10px] p-2 rounded -top-10 z-20">
+                  <div className="absolute hidden group-hover:block bg-gray-800 text-white text-[10px] p-2 rounded -top-10 z-20 whitespace-nowrap">
                     {data.amount} ETB
                   </div>
                 </div>
@@ -375,13 +377,13 @@ const AdminDashboard = () => {
         </div>
 
         {/* Analytics Sidebar: Insights */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
             <Search className="text-blue-500" /> Key Insights
           </h2>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="p-2 bg-orange-100 rounded-lg">
+              <div className="p-2 bg-orange-100 rounded-lg shrink-0">
                 <Clock className="text-orange-600" size={20} />
               </div>
               <div>
@@ -394,7 +396,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="p-2 bg-green-100 rounded-lg shrink-0">
                 <DollarSign className="text-green-600" size={20} />
               </div>
               <div>
@@ -405,7 +407,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="p-2 bg-purple-100 rounded-lg shrink-0">
                 <Users className="text-purple-600" size={20} />
               </div>
               <div>
@@ -422,21 +424,21 @@ const AdminDashboard = () => {
       </div>
 
       {/* 4. Transactions Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-8">
+        <div className="p-4 md:p-6 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-800">
             Recent Transactions
           </h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left min-w-[700px]">
             <thead>
               <tr className="bg-gray-50 text-gray-400 text-xs uppercase font-semibold tracking-wider">
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Transaction ID</th>
-                <th className="px-6 py-4">Slot</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-center">Actions</th>
+                <th className="px-4 md:px-6 py-4">User</th>
+                <th className="px-4 md:px-6 py-4">Transaction ID</th>
+                <th className="px-4 md:px-6 py-4">Slot</th>
+                <th className="px-4 md:px-6 py-4">Status</th>
+                <th className="px-4 md:px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -446,7 +448,7 @@ const AdminDashboard = () => {
                     key={b._id}
                     className="hover:bg-gray-50 transition-colors group"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-4">
                       <div className="font-medium text-gray-800">
                         {b.userId?.name || "Guest User"}
                       </div>
@@ -454,17 +456,17 @@ const AdminDashboard = () => {
                         {b.userId?.email || ""}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">
+                    <td className="px-4 md:px-6 py-4 font-mono text-xs text-gray-500">
                       {b.transactionId || "---"}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-4">
                       <span className="px-2 py-1 bg-gray-100 rounded text-gray-600 font-mono text-xs uppercase">
                         {b.slotId?.label || "N/A"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs">
+                    <td className="px-4 md:px-6 py-4 text-xs">
                       <span
-                        className={`px-2.5 py-1 rounded-full font-bold uppercase tracking-tight ${
+                        className={`px-2.5 py-1 rounded-full font-bold uppercase tracking-tight whitespace-nowrap ${
                           b.status === "completed"
                             ? "bg-green-100 text-green-700"
                             : "bg-yellow-100 text-yellow-700"
@@ -473,7 +475,7 @@ const AdminDashboard = () => {
                         {b.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-4 md:px-6 py-4 text-center">
                       <button
                         onClick={() => handleDeleteBooking(b._id)}
                         className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
@@ -488,7 +490,7 @@ const AdminDashboard = () => {
                 <tr>
                   <td
                     colSpan="5"
-                    className="px-6 py-12 text-center text-gray-400 italic"
+                    className="px-4 md:px-6 py-12 text-center text-gray-400 italic"
                   >
                     No transactions found matching your search.
                   </td>
@@ -501,23 +503,23 @@ const AdminDashboard = () => {
 
       {/* 5. User Management Section */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mt-8 overflow-hidden mb-12">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
             <Users className="text-purple-500" /> User Directory
           </h2>
-          <span className="text-xs font-medium text-gray-400">
+          <span className="text-xs font-medium text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
             {users.length} Total Users
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left min-w-[600px]">
             <thead>
               <tr className="bg-gray-50 text-gray-400 text-xs uppercase font-semibold">
-                <th className="px-6 py-4">Full Name</th>
-                <th className="px-6 py-4">Contact Info</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4 text-center">Actions</th>
+                <th className="px-4 md:px-6 py-4">Full Name</th>
+                <th className="px-4 md:px-6 py-4">Contact Info</th>
+                <th className="px-4 md:px-6 py-4">Role</th>
+                <th className="px-4 md:px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -527,9 +529,9 @@ const AdminDashboard = () => {
                     key={user._id}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0">
                           {user.name?.charAt(0).toUpperCase() || "U"}
                         </div>
                         <span className="font-medium text-gray-800">
@@ -537,15 +539,17 @@ const AdminDashboard = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">{user.email}</div>
+                    <td className="px-4 md:px-6 py-4">
+                      <div className="text-sm text-gray-600 truncate max-w-[150px] md:max-w-none">
+                        {user.email}
+                      </div>
                       <div className="text-xs text-gray-400">
                         {user.phone || "No phone"}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-4">
                       <span
-                        className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                        className={`px-2 py-1 rounded text-[10px] font-bold uppercase whitespace-nowrap ${
                           user.role === "admin"
                             ? "bg-red-100 text-red-600"
                             : "bg-blue-100 text-blue-600"
@@ -554,9 +558,9 @@ const AdminDashboard = () => {
                         {user.role || "user"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-4 md:px-6 py-4 text-center">
                       <button
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
                         onClick={() => alert("Delete user logic goes here")}
                       >
                         <Trash2 size={16} />
@@ -568,7 +572,7 @@ const AdminDashboard = () => {
                 <tr>
                   <td
                     colSpan="4"
-                    className="px-6 py-8 text-center text-gray-400 italic"
+                    className="px-4 md:px-6 py-8 text-center text-gray-400 italic"
                   >
                     No registered users found.
                   </td>

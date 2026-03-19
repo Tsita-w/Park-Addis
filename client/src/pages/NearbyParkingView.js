@@ -123,7 +123,7 @@ const NearbyParkingView = () => {
         body: JSON.stringify({
           slotId: chosenSlot._id,
           lotId: selectedSpot._id,
-          amount: pricing.price, // FIXED: Now uses the dynamic price
+          amount: pricing.price,
           userId: "65f1a2b3c4d5e6f7a8b9c0d1",
         }),
       });
@@ -134,7 +134,7 @@ const NearbyParkingView = () => {
         const bookingDetails = {
           lotName: selectedSpot.name,
           slotLabel: chosenSlot.slotNumber,
-          price: pricing.price, // FIXED: Now saves the dynamic price
+          price: pricing.price,
         };
         localStorage.setItem("lastBooking", JSON.stringify(bookingDetails));
 
@@ -156,9 +156,12 @@ const NearbyParkingView = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
+    // Changed flex-row to flex-col on mobile, and lg:flex-row on desktop
+    <div className="flex flex-col lg:flex-row h-screen w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
+
       {/* LEFT SIDE: MAP */}
-      <div className="relative flex-1 z-10">
+      {/* On mobile: takes up 45% of screen height. On desktop: takes up remaining space (lg:flex-1) */}
+      <div className="relative h-[45vh] lg:h-auto lg:flex-1 z-10">
         <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
           <ChangeView center={mapCenter} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -172,11 +175,12 @@ const NearbyParkingView = () => {
           ))}
         </MapContainer>
 
-        <div className="absolute top-8 left-8 right-8 z-[1000] max-w-2xl">
+        {/* Adjusted search bar spacing for mobile (top-4/left-4) vs desktop (top-8/left-8) */}
+        <div className="absolute top-4 lg:top-8 left-4 lg:left-8 right-4 lg:right-8 z-[1000] max-w-2xl">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-            <Input
-              className="h-14 pl-12 pr-12 rounded-2xl bg-white shadow-2xl border-none font-medium"
+            <input
+              className="h-12 sm:h-14 w-full pl-12 pr-4 rounded-2xl bg-white shadow-2xl border-none font-medium outline-none"
               placeholder="Search parking in Addis..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -186,17 +190,20 @@ const NearbyParkingView = () => {
       </div>
 
       {/* RIGHT SIDE: LIST */}
-      <div className="w-[420px] bg-white border-l flex flex-col shadow-2xl z-30">
-        <div className="p-8 border-b"><h1 className="text-2xl font-black">Nearby Spots</h1></div>
-        <ScrollArea className="flex-1 px-8">
-          <div className="py-8 space-y-6">
+      {/* On mobile: full width, takes up remaining height (flex-1). On desktop: 420px fixed width */}
+      <div className="w-full lg:w-[420px] flex-1 lg:flex-none bg-white lg:border-l flex flex-col shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] lg:shadow-2xl z-30 rounded-t-3xl lg:rounded-none -mt-4 lg:mt-0 relative overflow-hidden">
+        <div className="p-6 lg:p-8 border-b">
+            <h1 className="text-xl sm:text-2xl font-black">Nearby Spots</h1>
+        </div>
+        <ScrollArea className="flex-1 px-4 sm:px-8">
+          <div className="py-6 sm:py-8 space-y-4 sm:space-y-6">
             {filteredSpots.map((spot) => (
-              <Card key={spot._id} className="p-6 border-slate-100 shadow-sm hover:shadow-xl transition-all rounded-[32px]">
+              <Card key={spot._id} className="p-5 sm:p-6 border-slate-100 shadow-sm hover:shadow-xl transition-all rounded-[24px] sm:rounded-[32px]">
                 <div className="flex justify-between items-start mb-4">
                   <Badge className="bg-green-50 text-green-600 border-none text-[10px] font-black uppercase">Available</Badge>
-                  <p className="text-2xl font-black">{spot.pricePerHour} ETB</p>
+                  <p className="text-xl sm:text-2xl font-black">{spot.pricePerHour} ETB</p>
                 </div>
-                <h3 className="text-xl font-bold mb-4">{spot.name}</h3>
+                <h3 className="text-lg sm:text-xl font-bold mb-4">{spot.name}</h3>
                 <Button
                   onClick={() => { setSelectedSpot(spot); setIsModalOpen(true); }}
                   className="w-full bg-slate-900 hover:bg-blue-600 text-white h-12 rounded-2xl font-bold transition-all"
@@ -210,20 +217,21 @@ const NearbyParkingView = () => {
       {/* SLOT SELECTION MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-[2000] flex items-center justify-center p-4 backdrop-blur-sm">
-          <Card className="w-full max-w-md p-8 rounded-[40px] bg-white shadow-2xl relative border-none">
+          {/* Added max-h-[90vh] and overflow-y-auto so the modal scrolls on tiny phones instead of cutting off */}
+          <Card className="w-full max-w-md p-6 sm:p-8 rounded-[30px] sm:rounded-[40px] bg-white shadow-2xl relative border-none max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => { setIsModalOpen(false); setChosenSlot(null); setBookingSuccessData(null); }}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-900"
-            ><X size={24} /></button>
+              className="absolute top-4 sm:top-6 right-4 sm:right-6 text-slate-400 hover:text-slate-900 bg-slate-50 rounded-full p-2 sm:bg-transparent sm:p-0"
+            ><X size={20} className="sm:w-6 sm:h-6" /></button>
 
             {!bookingSuccessData ? (
               <>
-                <h2 className="text-2xl font-black mb-1 text-center">Select Your Space</h2>
-                <p className="text-slate-500 mb-6 text-sm font-medium text-center">
+                <h2 className="text-xl sm:text-2xl font-black mb-1 text-center mt-2 sm:mt-0">Select Your Space</h2>
+                <p className="text-slate-500 mb-4 sm:mb-6 text-xs sm:text-sm font-medium text-center">
                   Picking at <span className="text-slate-900 font-bold">{selectedSpot?.name}</span>
                 </p>
 
-                <div className="grid grid-cols-4 gap-3 mb-8 mt-6">
+                <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8 mt-4 sm:mt-6">
                   {loadingSlots ? (
                     <div className="col-span-4 py-10 text-center text-slate-400 font-medium italic">Loading available spaces...</div>
                   ) : availableSlots.length > 0 ? (
@@ -232,62 +240,62 @@ const NearbyParkingView = () => {
                         key={slot._id}
                         disabled={slot.status !== "available"}
                         onClick={() => setChosenSlot(slot)}
-                        className={`h-12 rounded-2xl font-bold border-2 transition-all flex flex-col items-center justify-center ${
+                        className={`h-10 sm:h-12 rounded-xl sm:rounded-2xl font-bold border-2 transition-all flex flex-col items-center justify-center ${
                           slot.status !== "available" ? "bg-slate-100 border-transparent text-slate-300 cursor-not-allowed" :
                           chosenSlot?._id === slot._id ? "bg-blue-600 border-blue-600 text-white shadow-lg" : "bg-white border-slate-100 text-slate-600 hover:border-blue-400 shadow-sm"
                         }`}
-                      ><span className="text-xs">{slot.slotNumber}</span></button>
+                      ><span className="text-[10px] sm:text-xs">{slot.slotNumber}</span></button>
                     ))
                   ) : (
-                    <div className="col-span-4 py-10 text-center text-red-400 text-sm font-medium bg-red-50 rounded-2xl">No slots found.</div>
+                    <div className="col-span-4 py-8 text-center text-red-400 text-xs sm:text-sm font-medium bg-red-50 rounded-2xl">No slots found.</div>
                   )}
                 </div>
 
-                {/* --- ADDED: SURGE PRICING WARNING --- */}
+                {/* SURGE PRICING WARNING */}
                 {pricing.multiplier > 1 && (
-                  <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-                    <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
-                      <TrendingUp size={20} />
+                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+                    <div className="p-1.5 sm:p-2 bg-amber-100 rounded-lg text-amber-600 shrink-0">
+                      <TrendingUp size={16} className="sm:w-5 sm:h-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-amber-900">High Demand: {pricing.multiplier}x Surge</p>
-                      <p className="text-xs text-amber-700">
+                      <p className="text-xs sm:text-sm font-bold text-amber-900">High Demand: {pricing.multiplier}x Surge</p>
+                      <p className="text-[10px] sm:text-xs text-amber-700 mt-0.5">
                         Prices are higher because the lot is {pricing.demandLevel === 'High' ? 'nearly full' : 'busy'}.
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* --- ADDED: PRICE DISPLAY --- */}
-                <div className="bg-slate-50 p-5 rounded-[24px] mb-8">
+                {/* PRICE DISPLAY */}
+                <div className="bg-slate-50 p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] mb-6 sm:mb-8">
                   <div className="flex justify-between items-center mb-2">
-                     <span className="text-slate-500 font-medium text-xs uppercase tracking-widest">Selected Space:</span>
-                     <span className="text-blue-600 font-black">{chosenSlot ? `Slot ${chosenSlot.slotNumber}` : "None"}</span>
+                     <span className="text-slate-500 font-medium text-[10px] sm:text-xs uppercase tracking-widest">Selected Space:</span>
+                     <span className="text-blue-600 font-black text-sm">{chosenSlot ? `Slot ${chosenSlot.slotNumber}` : "None"}</span>
                   </div>
                   <div className="flex justify-between items-center border-t border-slate-200 pt-2">
-                    <span className="text-slate-900 font-bold">Total to Pay:</span>
-                    <span className="text-xl font-black text-slate-900">{pricing.price} ETB</span>
+                    <span className="text-slate-900 font-bold text-sm sm:text-base">Total to Pay:</span>
+                    <span className="text-lg sm:text-xl font-black text-slate-900">{pricing.price} ETB</span>
                   </div>
                 </div>
 
                 <Button
                   disabled={!chosenSlot || bookingLoading}
-                  className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all"
+                  className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all text-sm sm:text-base"
                   onClick={handlePayment}
                 >
-                  {bookingLoading ? "Connecting to Telebirr..." : "Pay & Confirm Selection"}
+                  {bookingLoading ? "Connecting..." : "Pay & Confirm Selection"}
                 </Button>
               </>
             ) : (
               /* Success View */
-              <div className="text-center py-4">
-                <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={40} /></div>
-                <h2 className="text-2xl font-black mb-2 tracking-tight">Reserved Successfully!</h2>
-                <p className="text-slate-500 mb-6 text-sm font-medium">Space {chosenSlot?.slotNumber} is reserved.</p>
-                <div className="bg-white p-4 rounded-3xl inline-block mb-8 shadow-inner border border-slate-100">
-                  <img src={bookingSuccessData.qrCode} alt="QR Code" className="w-48 h-48" />
+              <div className="text-center py-2 sm:py-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6"><CheckCircle2 size={32} className="sm:w-10 sm:h-10" /></div>
+                <h2 className="text-xl sm:text-2xl font-black mb-2 tracking-tight">Reserved Successfully!</h2>
+                <p className="text-slate-500 mb-4 sm:mb-6 text-xs sm:text-sm font-medium">Space {chosenSlot?.slotNumber} is reserved.</p>
+                <div className="bg-white p-3 sm:p-4 rounded-2xl sm:rounded-3xl inline-block mb-6 sm:mb-8 shadow-inner border border-slate-100">
+                  <img src={bookingSuccessData.qrCode} alt="QR Code" className="w-40 h-40 sm:w-48 sm:h-48" />
                 </div>
-                <Button className="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold" onClick={() => setIsModalOpen(false)}>Back to List</Button>
+                <Button className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-900 text-white font-bold text-sm sm:text-base" onClick={() => setIsModalOpen(false)}>Back to List</Button>
               </div>
             )}
           </Card>
